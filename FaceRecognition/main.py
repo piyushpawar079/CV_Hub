@@ -211,7 +211,6 @@ class FaceRecognitionSystem:
                 self.is_ready_counting_down = False
                 cv2.destroyAllWindows()
                 self.app.run(self.cap)
-                # print('Done')
 
     def run(self):
         login_button_pos = (100, 200)

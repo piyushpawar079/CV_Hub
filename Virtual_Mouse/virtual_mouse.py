@@ -57,8 +57,9 @@ class VirtualMouse:
 
                 if self.fingers[1] and self.fingers[2]:
                     self.click_mouse(x1, y1, x2, y2, img)
-            elif self.fingers == [1, 1, 1, 1, 1] or self.fingers == [0, 1, 1, 1, 1]:
-                self.over = True
+
+                if self.fingers == [1, 1, 1, 1, 1] or self.fingers == [0, 1, 1, 1, 1]:
+                    self.over = True
 
         self.display_fps(img)
         return img
@@ -92,8 +93,9 @@ class VirtualMouse:
         self.pTime = self.cTime
         cv2.putText(img, str(int(fps)), (20, 50), cv2.FONT_HERSHEY_PLAIN, 3, (255, 0, 255), 3)
 
-    def run(self, cam):
-        self.cap = cam
+    def run(self, cam=None):
+        if cam:
+            self.cap = cam
         while True:
             success, img = self.cap.read()
             if not success:

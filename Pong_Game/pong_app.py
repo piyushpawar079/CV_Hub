@@ -10,11 +10,11 @@ class PongGame:
         self.cam.set(3, 1280)
         self.cam.set(4, 720)
 
-        self.img_background = cv2.imread(r'/Resources/Background.png')
-        self.img_game_over = cv2.imread(r'/Resources/gameOver.png')
-        self.img_ball = cv2.imread(r'/Resources/Ball.png', cv2.IMREAD_UNCHANGED)
-        self.img_bat1 = cv2.imread(r'/Resources/bat1.png', cv2.IMREAD_UNCHANGED)
-        self.img_bat2 = cv2.imread(r'/Resources/bat2.png', cv2.IMREAD_UNCHANGED)
+        self.img_background = cv2.imread(r'C:\Users\bhush\OneDrive\Desktop\PAVAN\Projects\CV_Desktop\Resources\Background.png')
+        self.img_game_over = cv2.imread(r'C:\Users\bhush\OneDrive\Desktop\PAVAN\Projects\CV_Desktop\Resources\gameOver.png')
+        self.img_ball = cv2.imread(r'C:\Users\bhush\OneDrive\Desktop\PAVAN\Projects\CV_Desktop\Resources\Ball.png', cv2.IMREAD_UNCHANGED)
+        self.img_bat1 = cv2.imread(r'C:\Users\bhush\OneDrive\Desktop\PAVAN\Projects\CV_Desktop\Resources\bat1.png', cv2.IMREAD_UNCHANGED)
+        self.img_bat2 = cv2.imread(r'C:\Users\bhush\OneDrive\Desktop\PAVAN\Projects\CV_Desktop\Resources\bat2.png', cv2.IMREAD_UNCHANGED)
 
         self.ball_pos = [100, 100]
         self.speed_x = 20

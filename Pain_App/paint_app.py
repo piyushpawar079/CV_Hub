@@ -5,7 +5,6 @@ import numpy as np
 import math
 import mysql.connector
 
-
 class VirtualPainter:
     def __init__(self, username=None):
         self.cam = cv2.VideoCapture(0)
@@ -17,6 +16,10 @@ class VirtualPainter:
         self.folder = r'C:\Users\bhush\OneDrive\Desktop\PAVAN\Projects\CV_Desktop\Images'
         self.header_images = [cv2.imread(f'{self.folder}/{img}') for img in os.listdir(self.folder)]
         self.header = self.header_images[0]
+
+        self.icon_img = cv2.imread(r'C:\Users\bhush\OneDrive\Desktop\PAVAN\Projects\CV_Desktop\MenuIcon2.png',
+                                   cv2.IMREAD_UNCHANGED)
+        self.icon_img = cv2.resize(self.icon_img, (40, 40))
 
         self.xp, self.yp = 0, 0
         self.brush_thickness = 30
@@ -71,9 +74,40 @@ class VirtualPainter:
         self.canvas_states.append(self.img_canvas.copy())
         self.undo_button_active = True
 
-    def draw_menu_button(self, img):
-        cv2.circle(img, (1190, 120), 20, (255, 0, 0), -1)
-        return img
+    def draw_menu_button(self, background, overlay, x, y):
+        if background.shape[2] == 3:
+            background = cv2.cvtColor(background, cv2.COLOR_BGR2BGRA)
+        if overlay.shape[2] == 3:
+            overlay = cv2.cvtColor(overlay, cv2.COLOR_BGR2BGRA)
+
+        bg_h, bg_w, bg_channels = background.shape
+        ol_h, ol_w, ol_channels = overlay.shape
+
+        # Ensure the overlay is within the bounds of the background image
+        if x + ol_w > bg_w or y + ol_h > bg_h:
+            raise ValueError("Overlay image goes out of bounds of the background image.")
+
+        # Get the region of interest (ROI) from the background image
+        roi = background[y:y + ol_h, x:x + ol_w]
+
+        # Convert overlay image to have an alpha channel if it doesn't already
+        if overlay.shape[2] == 3:
+            overlay = cv2.cvtColor(overlay, cv2.COLOR_BGR2BGRA)
+        if background.shape[2] == 3:
+            background = cv2.cvtColor(background, cv2.COLOR_BGR2BGRA)
+
+        # Separate the alpha channel from the overlay image
+        overlay_img = overlay[:, :, :3]
+        alpha_mask = overlay[:, :, 3] / 255.0
+
+        # Blend the ROI and the overlay image
+        for c in range(0, 3):
+            roi[:, :, c] = roi[:, :, c] * (1 - alpha_mask) + overlay_img[:, :, c] * alpha_mask
+
+        # Replace the original ROI in the background image with the blended ROI
+        background[y:y + ol_h, x:x + ol_w] = roi
+
+        return background
 
     def draw(self, cam=None):
         if cam:
@@ -86,7 +120,6 @@ class VirtualPainter:
 
                 self.draw_undo_button(img)
                 self.draw_brush_slider(img)
-                img = self.draw_menu_button(img)
 
                 if self.show_options:
                     img = self.draw_options(img)
@@ -94,9 +127,10 @@ class VirtualPainter:
                 if hands:
                     self.lm_list = self.detector.findPosition(img)
                     if self.lm_list:
-                        self.process_hand_gestures(img, hands)
+                        if self.process_hand_gestures(img, hands):
+                            break
 
-                        if 1100 < self.lm_list[8][1] < 1280 and 90 < self.lm_list[8][2] < 140 and not self.show_menu:
+                        if 1000 < self.lm_list[8][1] < 1180 and 50 < self.lm_list[8][2] < 140 and not self.show_menu:
                             self.show_menu = True
                         if self.show_menu:
                             img = self.draw_menu(img)
@@ -113,6 +147,8 @@ class VirtualPainter:
 
                 img[:104, :1007] = self.header
 
+                img = self.draw_menu_button(img, self.icon_img, 1100, 80)
+
                 cv2.imshow('img', img)
                 key = cv2.waitKey(1)
                 if key == ord('q'):
@@ -128,14 +164,14 @@ class VirtualPainter:
 
         if fingers[1] and fingers[2]:
             self.xp, self.yp = 0, 0
-            self.show_menu = False
             if 1090 < x1 < 1180 and 10 < y1 < 60 and self.undo_button_active:
                 # print(f"Attempting to undo. Button active: {self.undo_button_active}")
                 self.undo()
                 cv2.waitKey(10)
             elif 130 < y1 < 160:
                 self.adjust_brush_size(x1)
-            else:
+            elif x1 < 1000:
+                self.show_menu = False
                 self.select_tool(x1, y1, x2, y2, img)
         elif fingers[1] and not fingers[2]:
             if self.show_options:
@@ -143,12 +179,14 @@ class VirtualPainter:
             elif self.fill_type:
                 self.select_fill_area(x1, y1, img)
             elif self.show_menu:
-                if 1100 < x1 < 1280 and 70 < y1 < 200:
-                    if 100 < y1 < 130:  # Save
-                        self.save_screenshot(img, self.username)
-                    elif 130 < y1 < 160:  # Exit
+                if 1000 < x1 < 1180 and 70 < y1 < 200:
+                    # if 100 < y1 < 140:  # Save
+                    #     print('save')
+                    #     self.save_screenshot(img)
+                    if 150 < y1 < 200:  # Exit
+                        print('exit')
                         cv2.destroyAllWindows()
-                        exit()
+                        return 1
             else:
                 self.draw_on_canvas(img, hands)
         elif not fingers[1] and not fingers[2]:
@@ -161,40 +199,14 @@ class VirtualPainter:
         else:
             self.xp, self.yp = 0, 0
 
-    def save_screenshot(self, img, username):
-        # Save screenshot to database
-        conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="piyush@12345",
-            database="face_recognition_db"
-        )
-        cursor = conn.cursor()
-
-        # Create table if not exists
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS screenshots (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                username VARCHAR(255),
-                screenshot LONGBLOB,
-                FOREIGN KEY (username) REFERENCES users (name)
-            )
-        """)
-
-        # Convert image to bytes
-        ret, buffer = cv2.imencode('.png', img)
-        data = buffer.tobytes()
-
-        # Insert screenshot into database
-        cursor.execute("INSERT INTO screenshots (username, screenshot) VALUES (%s, %s)", (username, data))
-        conn.commit()
-        conn.close()
+    def save_screenshot(self, img):
+        cv2.imwrite(f'Output.jpg', img)
 
     def draw_menu(self, img):
         overlay = img.copy()
-        cv2.rectangle(overlay, (1000, 100), (1250, 250), (50, 50, 50), -1)  # Options background
-        cv2.putText(overlay, "Save", (1020, 120), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-        cv2.putText(overlay, "Exit", (1020, 220), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+        cv2.rectangle(overlay, (1000, 120), (1250, 210), (50, 50, 50), -1)  # Options background
+        # cv2.putText(overlay, "Save", (1020, 130), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+        cv2.putText(overlay, "Exit", (1020, 170), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
         # Blend the overlay with the original image
         img = cv2.addWeighted(overlay, 0.7, img, 0.3, 0)
@@ -408,6 +420,7 @@ class VirtualPainter:
             cv2.line(img, self.line_start, self.line_end, self.color2, 5)
             cv2.line(self.img_canvas, self.line_start, self.line_end, self.color2, 5)
 
+
 if __name__ == '__main__':
-    painter = VirtualPainter()
+    painter = VirtualPainter(username='OM')
     painter.draw()

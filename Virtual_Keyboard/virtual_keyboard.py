@@ -4,7 +4,7 @@ import cvzone
 import time
 from PIL import ImageFont, ImageDraw, Image
 import os
-from spellchecker import SpellChecker
+# from spellchecker import SpellChecker
 from pynput.keyboard import Controller
 from cvzone.HandTrackingModule import HandDetector
 
@@ -47,7 +47,7 @@ class VirtualKeyboard:
         self.debounce_time = 1
         self.last_press_time = time.time()
 
-        self.spell = SpellChecker('en')
+        # self.spell = SpellChecker('en')
 
         self.button_list = self.create_button_list()
 
@@ -248,18 +248,18 @@ class VirtualKeyboard:
         self.current_keys = self.keys_mr if self.current_keys == self.keys_en else self.keys_en
         self.button_list = self.create_button_list()
 
-    def autocorrect(self):
-        if self.final_text and self.final_text[-1] == " " and self.current_keys == self.keys_en:
-            words = self.final_text.split()
-            if len(words) > self.prev_len:
-                last_word = words[-1]
-                corrected_word = self.spell.correction(last_word)
-                if corrected_word != last_word:
-                    self.prev_len = len(words)
-                    if self.caps:
-                        corrected_word = corrected_word.upper()
-                    words[-1] = corrected_word
-                    self.final_text = ' '.join(words) + ' '
+    # def autocorrect(self):
+    #     if self.final_text and self.final_text[-1] == " " and self.current_keys == self.keys_en:
+    #         words = self.final_text.split()
+    #         if len(words) > self.prev_len:
+    #             last_word = words[-1]
+    #             corrected_word = self.spell.correction(last_word)
+    #             if corrected_word != last_word:
+    #                 self.prev_len = len(words)
+    #                 if self.caps:
+    #                     corrected_word = corrected_word.upper()
+    #                 words[-1] = corrected_word
+    #                 self.final_text = ' '.join(words) + ' '
 
     def run(self):
         while True:
@@ -279,7 +279,7 @@ class VirtualKeyboard:
 
                     self.check_hand_position(img, button, hands)
 
-            self.autocorrect()
+            # self.autocorrect()
 
             img = draw_text_with_pil(img, self.final_text, (50, 50), self.font, (0, 0, 255))
 

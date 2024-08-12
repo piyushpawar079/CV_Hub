@@ -94,12 +94,12 @@ class VolumeControl:
     def display_fps(img, fps):
         cv2.putText(img, str(int(fps)), (10, 70), cv2.FONT_ITALIC, 3, (255, 0, 255), 3)
 
-    def toggle_mute(self):
-        current_volume = self.volume.GetMasterVolumeLevel()
-        if current_volume != self.minVolume:
-            self.volume.SetMasterVolumeLevel(self.minVolume, None)
-        else:
-            self.volume.SetMasterVolumeLevel(self.maxVolume, None)
+    # def toggle_mute(self):
+    #     current_volume = self.volume.GetMasterVolumeLevel()
+    #     if current_volume != self.minVolume:
+    #         self.volume.SetMasterVolumeLevel(self.minVolume, None)
+    #     else:
+    #         self.volume.SetMasterVolumeLevel(self.maxVolume, None)
 
     # def change_brightness(level):
     #     sbc.set_brightness(level)
@@ -145,15 +145,14 @@ class VolumeControl:
                 #     length = math.hypot(x2 - x1)
                 #     brightness = np.interp(length, [50, 300], [0, 100])
                 #     change_brightness(int(brightness))
-                elif fingers[4] and not any(fingers[:4]):
-                    description = 'Mute/Unmute Mode:- You can use your pinky finger to toggle mute and unmute.'
-                    self.toggle_mute()
+                # elif fingers[4] and not any(fingers[:4]):
+                #     description = 'Mute/Unmute Mode:- You can use your pinky finger to toggle mute and unmute.'
+                #     self.toggle_mute()
                 else:
                     description = 'There is nothing assigned to this gesture.'
 
-        self.draw_text_within_rectangle(img, description, (500, 50), (1100, 200))
+        # self.draw_text_within_rectangle(img, description, (500, 50), (1100, 200))
         self.display_volume_bar(img, self.volBar, self.volPer, self.selected, self.volbar1, self.volbar2)
-
 
         cTime = time.time()
         fps = 1 / (cTime - self.pTime)
@@ -163,42 +162,42 @@ class VolumeControl:
 
         return img
 
-    @staticmethod
-    def draw_text_within_rectangle(image, text, rect_top_left, rect_bottom_right, font=cv2.FONT_HERSHEY_SIMPLEX,
-                                   font_scale=1, font_color=(255, 255, 255), font_thickness=2):
-        # Define the rectangle
-        cv2.rectangle(image, rect_top_left, rect_bottom_right, (0, 255, 0), 2)
-
-        # Calculate the width of the rectangle
-        rect_width = rect_bottom_right[0] - rect_top_left[0]
-        rect_height = rect_bottom_right[1] - rect_top_left[1]
-
-        # Split text into words
-        words = text.split(' ')
-        current_line = ''
-        y0, dy = rect_top_left[1] + 30, 30
-
-        for word in words:
-            # Check if adding the next word will go out of the rectangle's width
-            test_line = current_line + word + ' '
-            text_size, _ = cv2.getTextSize(test_line, font, font_scale, font_thickness)
-
-            if text_size[0] > rect_width:
-                # Write the current line on the image
-                cv2.putText(image, current_line, (rect_top_left[0] + 10, y0), font, font_scale, font_color,
-                            font_thickness, lineType=cv2.LINE_AA)
-                current_line = word + ' '
-                y0 += dy
-
-                # Check if we are exceeding the height of the rectangle
-                if (y0 + dy - rect_top_left[1]) > rect_height:
-                    break
-            else:
-                current_line = test_line
-
-        # Write the last line
-        cv2.putText(image, current_line, (rect_top_left[0] + 10, y0), font, font_scale, font_color, font_thickness,
-                    lineType=cv2.LINE_AA)
+    # @staticmethod
+    # def draw_text_within_rectangle(image, text, rect_top_left, rect_bottom_right, font=cv2.FONT_HERSHEY_SIMPLEX,
+    #                                font_scale=1, font_color=(255, 255, 255), font_thickness=2):
+    #     # Define the rectangle
+    #     cv2.rectangle(image, rect_top_left, rect_bottom_right, (0, 255, 0), 2)
+    #
+    #     # Calculate the width of the rectangle
+    #     rect_width = rect_bottom_right[0] - rect_top_left[0]
+    #     rect_height = rect_bottom_right[1] - rect_top_left[1]
+    #
+    #     # Split text into words
+    #     words = text.split(' ')
+    #     current_line = ''
+    #     y0, dy = rect_top_left[1] + 30, 30
+    #
+    #     for word in words:
+    #         # Check if adding the next word will go out of the rectangle's width
+    #         test_line = current_line + word + ' '
+    #         text_size, _ = cv2.getTextSize(test_line, font, font_scale, font_thickness)
+    #
+    #         if text_size[0] > rect_width:
+    #             # Write the current line on the image
+    #             cv2.putText(image, current_line, (rect_top_left[0] + 10, y0), font, font_scale, font_color,
+    #                         font_thickness, lineType=cv2.LINE_AA)
+    #             current_line = word + ' '
+    #             y0 += dy
+    #
+    #             # Check if we are exceeding the height of the rectangle
+    #             if (y0 + dy - rect_top_left[1]) > rect_height:
+    #                 break
+    #         else:
+    #             current_line = test_line
+    #
+    #     # Write the last line
+    #     cv2.putText(image, current_line, (rect_top_left[0] + 10, y0), font, font_scale, font_color, font_thickness,
+    #                 lineType=cv2.LINE_AA)
 
     def run(self, cam):
         self.cap = cam

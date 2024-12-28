@@ -1,5 +1,5 @@
 import cv2
-from cvzone.HandTrackingModule import HandDetector as hd
+from HandsGestureDetector import HandDetector as hd
 import os
 import numpy as np
 import math
@@ -13,11 +13,12 @@ class VirtualPainter:
         self.detector = hd()
         self.username = username
 
-        self.folder = r'C:\Users\bhush\OneDrive\Desktop\PAVAN\Projects\CV_Desktop\Images'
+        self.project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        self.folder = os.path.join(self.project_root, 'Images')
         self.header_images = [cv2.imread(f'{self.folder}/{img}') for img in os.listdir(self.folder)]
         self.header = self.header_images[0]
 
-        self.icon_img = cv2.imread(r'C:\Users\bhush\OneDrive\Desktop\PAVAN\Projects\CV_Desktop\MenuIcon2.png',
+        self.icon_img = cv2.imread(os.path.join(self.folder, 'MenuIcon2.png'),
                                    cv2.IMREAD_UNCHANGED)
         self.icon_img = cv2.resize(self.icon_img, (40, 40))
 

@@ -1,7 +1,7 @@
 import cv2
 import time
 import numpy as np
-from cvzone.HandTrackingModule import HandDetector as hd
+from HandsGestureDetector import HandDetector as hd
 from Volume_Control.volume_control import VolumeControl
 from Pain_App.paint_app import VirtualPainter
 from Presentation_App.presentation_app import PresentationController
@@ -11,6 +11,9 @@ from Math_AI.math_AI_app import HandGestureAI
 from Virtual_Keyboard.virtual_keyboard import VirtualKeyboard
 from Fitness_Tracker.fitness_tracker import ArmCurlsCounter
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class CVApp:
     def __init__(self):
@@ -18,7 +21,7 @@ class CVApp:
         self.cam.set(3, 1280)
         self.cam.set(4, 720)
 
-        api_key = 'AIzaSyBLoq2qPnvxqfGfyqZb2ifo202nkcPPKKA'
+        self.api_key = os.getenv('API_KEY')
 
         self.detector = hd(maxHands=1)
         self.vol_control = VolumeControl()
@@ -26,14 +29,17 @@ class CVApp:
         self.present_app = PresentationController()
         self.vir_mouse = VirtualMouse()
         self.pong_game = PongGame()
-        self.math_ai = HandGestureAI(api_key)
+        self.math_ai = HandGestureAI(self.api_key)
         self.vir_keyboard = VirtualKeyboard()
         self.fit = ArmCurlsCounter()
 
         self.over = False
         self.show_options = False
 
-        self.icon_img = cv2.imread(r'C:\Users\bhush\OneDrive\Desktop\PAVAN\Projects\CV_Desktop\MenuIcon2.png', cv2.IMREAD_UNCHANGED)
+        self.project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        self.folder = os.path.join(self.project_root, 'Images')
+
+        self.icon_img = cv2.imread(os.path.join(self.folder, 'MenuIcon2.png'), cv2.IMREAD_UNCHANGED)
         self.icon_img = cv2.resize(self.icon_img, (40, 40))
 
     def loading(self):
@@ -79,13 +85,13 @@ class CVApp:
 
     def draw_interface(self, img):
         buttons = [
-            (100, 100, 200, 200, 'Volume Control', r'C:\Users\bhush\OneDrive\Desktop\PAVAN\Projects\CV_Desktop\Volume+.png'),
-            (300, 100, 400, 200, 'Paint App', r'C:\Users\bhush\OneDrive\Desktop\PAVAN\Projects\CV_Desktop\PaintApp.png'),
-            (500, 100, 600, 200, 'Math AI App', r'C:\Users\bhush\OneDrive\Desktop\PAVAN\Projects\CV_Desktop\MathAI.png'),
-            (700, 100, 800, 200, 'Presentation App', r'C:\Users\bhush\OneDrive\Desktop\PAVAN\Projects\CV_Desktop\PresentationLogo.png'),
-            (100, 300, 200, 400, 'Pong Game', r'C:\Users\bhush\OneDrive\Desktop\PAVAN\Projects\CV_Desktop\PONGGame.png'),
-            (300, 300, 400, 400, 'Virtual Mouse', r'C:\Users\bhush\OneDrive\Desktop\PAVAN\Projects\CV_Desktop\VirtualMouse.png'),
-            (500, 300, 600, 400, 'Fitness Tracker', r'C:\Users\bhush\OneDrive\Desktop\PAVAN\Projects\CV_Desktop\FitnessTracker.png')
+            (100, 100, 200, 200, 'Volume Control',os.path.join(self.folder, 'Volume+.png')),
+            (300, 100, 400, 200, 'Paint App',os.path.join(self.folder, 'PaintApp.png')),
+            (500, 100, 600, 200, 'Math AI App',os.path.join(self.folder, 'MathAI.png')),
+            (700, 100, 800, 200, 'Presentation App',os.path.join(self.folder, 'PresentationLogo.png')),
+            (100, 300, 200, 400, 'Pong Game',os.path.join(self.folder, 'PONGGame.png')),
+            (300, 300, 400, 400, 'Virtual Mouse',os.path.join(self.folder, 'VirtualMouse.png')),
+            (500, 300, 600, 400, 'Fitness Tracker',os.path.join(self.folder, 'FitnessTracker.png'))
         ]
 
         for (x1, y1, x2, y2, label, icon_path) in buttons:

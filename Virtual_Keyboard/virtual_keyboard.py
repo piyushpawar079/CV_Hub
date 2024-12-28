@@ -6,7 +6,7 @@ from PIL import ImageFont, ImageDraw, Image
 import os
 # from spellchecker import SpellChecker
 from pynput.keyboard import Controller
-from cvzone.HandTrackingModule import HandDetector
+from HandsGestureDetector import HandDetector
 
 
 class VirtualKeyboard:
@@ -36,7 +36,7 @@ class VirtualKeyboard:
         self.final_text = ''
         self.prev_len = 0
 
-        font_path = "../Resources/static/NotoSansDevanagari-Regular.ttf"
+        font_path = "../Images/Resources/static/NotoSansDevanagari-Regular.ttf"
         if not os.path.isfile(font_path):
             raise FileNotFoundError(
                 f"Font file '{font_path}' not found. Please ensure the file exists and the path is correct.")

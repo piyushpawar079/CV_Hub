@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import google.generativeai as genai
-from cvzone.HandTrackingModule import HandDetector as hd
+from HandsGestureDetector import HandDetector as hd
 from PIL import Image
 import textwrap
 

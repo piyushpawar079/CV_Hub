@@ -199,8 +199,9 @@ class VolumeControl:
     #     cv2.putText(image, current_line, (rect_top_left[0] + 10, y0), font, font_scale, font_color, font_thickness,
     #                 lineType=cv2.LINE_AA)
 
-    def run(self, cam):
-        self.cap = cam
+    def run(self, cam=None):
+        if cam:
+            self.cap = cam
         while True:
             success, img = self.cap.read()
             if not success:

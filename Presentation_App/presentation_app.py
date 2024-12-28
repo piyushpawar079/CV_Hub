@@ -1,16 +1,19 @@
 import cv2
 import numpy as np
 import os
-from cvzone.HandTrackingModule import HandDetector as hd
+from HandsGestureDetector import HandDetector as hd
 
 class PresentationController:
-    def __init__(self, folder=r'C:\Users\bhush\OneDrive\Desktop\PAVAN\Projects\CV_Desktop\Presentations'):
+    def __init__(self):
         self.cam = cv2.VideoCapture(0)
         self.cam.set(3, 1280)
         self.cam.set(4, 720)
         self.detector = hd(maxHands=1)
-        self.folder = folder
-        self.images = os.listdir(folder)
+        # self.folder = folder
+        # self.images = os.listdir(folder)
+        self.project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        self.folder = os.path.join(self.project_root, r'Images\Presentations')
+        self.images = os.listdir(self.folder)
         self.img_number = 0
         self.ws, self.hs = 213, 120
         self.threshold = 425
@@ -99,8 +102,9 @@ class PresentationController:
                 if j:
                     cv2.line(img_current, self.annotations[i][j - 1], self.annotations[i][j], (0, 0, 200), 10)
 
-    def run(self, cam):
-        self.cam = cam
+    def run(self, cam=None):
+        if cam:
+            self.cam = cam
         while True:
             _, img = self.cam.read()
             if not _:

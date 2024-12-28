@@ -2,7 +2,6 @@ import face_recognition
 import cv2
 import numpy as np
 import mysql.connector
-from mysql.connector import pooling
 from HandsGestureDetector import HandDetector as hd
 import time
 from Home_Page.home_page import CVApp
@@ -11,15 +10,17 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import Tuple, Optional
 from Virtual_Keyboard.virtual_keyboard import VirtualKeyboard
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
 class DatabaseManager:
     def __init__(self):
         self.db_config = {
-            'host': os.getenv('DB_HOST', 'localhost'),
-            'user': os.getenv('DB_USER', 'root'),
-            'password': os.getenv('DB_PASSWORD', 'piyush@12345'),
-            'database': 'face_recognition_db'
+            'host': os.getenv('DB_HOST'),
+            'user': os.getenv('DB_USER'),
+            'password': os.getenv('DB_PASSWORD'),
+            'database': os.getenv('DB_NAME')
         }
         self.init_database()
         self.create_connection_pool()
